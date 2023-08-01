@@ -1,0 +1,24 @@
+# Rime schema
+# encoding: utf-8
+
+__include: flypy_luna.schema:/
+
+schema:
+  schema_id: flypy_self
+  name: 小鶴雙拼
+  version: "0.0.1"
+  author:
+    - double pinyin layout by 鶴
+    - Rime schema by Jeff Chien <jeffchien13@gmail.com>
+  description: |
+    小鶴雙拼方案，不使用朙月拼音字碼表。
+  dependencies:
+    - bopomofo_tw
+
+__patch:
+  - speller/algebra: []
+  - translator/dictionary: flypy_self
+  - translator/prism: flypy_self
+  - reverse_lookup_flypy/dictionary: flypy_self
+  - reverse_lookup_flypy/comment_format:
+  - flypy_self.custom:/patch?

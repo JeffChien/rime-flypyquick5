@@ -1,0 +1,327 @@
+# Rime schema
+# encoding: utf-8
+
+schema:
+  schema_id: flypy_luna
+  name: 小鶴雙拼/朙月字碼表
+  version: "0.0.5"
+  author:
+    - double pinyin layout by 鶴
+    - Rime schema by Jeff Chien <jeffchien13@gmail.com>
+  description: |
+    朙月拼音＋小鶴雙拼方案。
+  dependencies:
+    - bopomofo_tw
+    - cangjie5
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [中文, 西文]
+  - name: full_shape
+    states: [半角, 全角]
+  - name: ascii_punct
+    states: [。，, ．，]
+  - name: zh_hant_tw
+    reset: 1
+
+engine:
+  processors:
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+    #- fluency_editor # 語句流
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - affix_segmentor@translator_bopomofo_tw
+    - affix_segmentor@translator_cangjie5
+    - affix_segmentor@translator_cangjie5_phonetic
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - script_translator@translator_bopomofo_tw
+    - table_translator@translator_cangjie5
+    - table_translator@translator_cangjie5_phonetic
+    - script_translator
+  filters:
+    - simplifier
+    - simplifier@zh_hant_tw
+    - reverse_lookup_filter@reverse_lookup_flypy
+    - reverse_lookup_filter@reverse_lookup_bopomofo
+    - uniquifier
+
+# add menu option to use TW Chinese
+zh_hant_tw:
+  option_name: zh_hant_tw
+  opencc_config: t2tw.json
+  tips: none
+
+translator_bopomofo_tw:
+  tag: translator_bopomofo_tw
+  dictionary: terra_pinyin
+  enable_completion: true
+  prism: bopomofo_tw
+  prefix: "`b"
+  suffix: "'"
+  tips: 〔注音〕
+  preedit_format:
+    - "xlit|1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 6347'|ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˉˊˇˋ˙ |"
+
+translator_cangjie5:
+  __include: cangjie5.schema:/translator
+  tag: translator_cangjie5
+  prism: cangjie5
+  enable_charset_filter: true
+  enable_sentence: false
+  enable_encoder: false
+  encode_commit_history: false
+  prefix: "`c"
+  suffix: "'"
+  tips: 〔倉頡〕
+  comment_format: []
+
+translator_cangjie5_phonetic:
+  __include: /translator_cangjie5
+  tag: translator_cangjie5_phonetic
+  prefix: "`p"
+  suffix: "'"
+  tips: 〔倉頡讀音〕
+  comment_format: []
+
+# this section add double pinyin symbols when query with bopomofo_tw
+reverse_lookup_flypy:
+  tags: [translator_bopomofo_tw, translator_cangjie5]
+  overwrite_comment: true
+  dictionary: luna_pinyin
+  comment_format:
+    - xform/iu/Q/
+    - xform/ei/W/
+    - xform/[uv]e/T/
+    - xform/un/Y/
+    - xform/sh/U/
+    - xform/ch/I/
+    - xform/zh/V/
+    - xform/uo/O/
+    - xform/ie/P/
+    - xform/i?ong/S/
+    - xform/ing|uai/K/
+    - xform/ai/D/
+    - xform/eng/G/
+    - xform/en/F/
+    - xform/[iu]ang/L/
+    - xform/uan/R/
+    - xform/ang/H/
+    - xform/ian/M/
+    - xform/an/J/
+    - xform/ou/Z/
+    - xform/iao/N/
+    - xform/[iu]a/X/
+    - xform/ao/C/
+    - xform/ui/V/
+    - xform/in/B/
+    - xlit/QWRTYUIOPSDFGHJKLZXCVBNM/qwrtyuiopsdfghjklzxcvbnm/
+
+reverse_lookup_bopomofo:
+  tags: [translator_cangjie5_phonetic]
+  dictionary: terra_pinyin
+  prism: bopomofo_tw
+  overwrite_comment: true # 覆蓋其他提示
+  comment_format:
+    - "xform/e?r5$/er5/"
+    - "xform/iu/iou/"
+    - "xform/ui/uei/"
+    - "xform/ong/ung/"
+    - "xform/yi?/i/"
+    - "xform/wu?/u/"
+    - "xform/iu/v/"
+    - "xform/([jqx])u/$1v/"
+    - "xform/([iuv])n/$1en/"
+    - "xform/zh/Z/"
+    - "xform/ch/C/"
+    - "xform/sh/S/"
+    - "xform/ai/A/"
+    - "xform/ei/I/"
+    - "xform/ao/O/"
+    - "xform/ou/U/"
+    - "xform/ang/K/"
+    - "xform/eng/G/"
+    - "xform/an/M/"
+    - "xform/en/N/"
+    - "xform/er/R/"
+    - "xform/eh/E/"
+    - "xform/([iv])e/$1E/"
+    - "xform/1//"
+    - "xlit|bpmfdtnlgkhjqxZCSrzcsiuvaoeEAIOUMNKGR2345|ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙|"
+    - "xform/ /} {/"
+    - "xform/^/ {"
+    - "xform/$/}/"
+
+speller:
+  alphabet: zyxwvutsrqponmlkjihgfedcba
+  delimiter: " '"
+  algebra:
+    - erase/^xx$/
+    - derive/^([jqxy])u$/$1v/
+    - derive/^([aoe])([ioun])$/$1$1$2/
+    - xform/^([aoe])(ng)?$/$1$1$2/
+    - xform/iu$/Q/
+    - xform/(.)ei$/$1W/
+    - xform/uan$/R/
+    - xform/[uv]e$/T/
+    - xform/un$/Y/
+    - xform/^sh/U/
+    - xform/^ch/I/
+    - xform/^zh/V/
+    - xform/uo$/O/
+    - xform/ie$/P/
+    - xform/i?ong$/S/
+    - xform/ing$|uai$/K/
+    - xform/(.)ai$/$1D/
+    - xform/(.)en$/$1F/
+    - xform/(.)eng$/$1G/
+    - xform/[iu]ang$/L/
+    - xform/(.)ang$/$1H/
+    - xform/ian$/M/
+    - xform/(.)an$/$1J/
+    - xform/(.)ou$/$1Z/
+    - xform/[iu]a$/X/
+    - xform/iao$/N/
+    - xform/(.)ao$/$1C/
+    - xform/ui$/V/
+    - xform/in$/B/
+    - xlit/QWRTYUIOPSDFGHJKLZXCVBNM/qwrtyuiopsdfghjklzxcvbnm/
+    #- abbrev/^(.).+$/$1/
+
+templates:
+  flypy_2_luna:
+    # input: flypy, output: full pingyin
+    preedit_format:
+      - xform/([bpmfdtnljqx])n/$1IAO/
+      - xform/eg/ENG/
+      - xform/(\w)g/$1ENG/
+      - xform/(\w)q/$1IU/
+      - xform/(\w)w/$1EI/
+      - xform/([dtnlgkhjqxyvuirzcs])r/$1UAN/
+      - xform/(\w)t/$1VE/
+      - xform/(\w)y/$1UN/
+      - xform/([dtnlgkhvuirzcs])o/$1UO/
+      - xform/(\w)p/$1IE/
+      - xform/([jqx])s/$1IONG/
+      - xform/(\w)s/$1ONG/
+      - xform/ad/AI/
+      - xform/(\w)d/$1AI/
+      - xform/(\w)f/$1EN/
+      - xform/ah/ANG/
+      - xform/eh/EH/
+      - xform/(\w)h/$1ANG/
+      - xform/aj/AN/
+      - xform/(\w)j/$1AN/
+      - xform/([gkhvuirzcs])k/$1UAI/
+      - xform/(\w)k/$1ING/
+      - xform/([jqxnl])l/$1IANG/
+      - xform/(\w)l/$1UANG/
+      - xform/(\w)z/$1OU/
+      - xform/([gkhvuirzcs])x/$1UA/
+      - xform/(\w)x/$1IA/
+      - xform/ac/AO/
+      - xform/(\w)c/$1AO/
+      - xform/([dtgkhvuirzcs])v/$1UI/
+      - xform/(\w)b/$1IN/
+      - xform/(\w)m/$1IAN/
+      - xform/([aoe])\1(\w)/\U$1\E$2/
+      - "xform/(^|[ '])v/$1ZH/"
+      - "xform/(^|[ '])i/$1CH/"
+      - "xform/(^|[ '])u/$1SH/"
+      - xform/(.)/\L$1\E/
+      - xform/([jqxy])v/$1u/
+      - xform/([nl])v/$1ü/
+  # for some symbol that can work along, append _ to indicate those cases.
+  luna_underscore_fix:
+    preedit_format:
+      - xform/(?<![a-z])ui/UI_/
+      - xform/(zh|ch|sh)i/\U$1\E_/
+      - xform/yu(?!e|an|n)/YU_/
+      - xform/(?<![a-z])wu/WU_/
+      - xform/(?<![a-z])ao/AO_/
+      - xform/(?<![a-z])ou/OU_/
+      - xform/(?<![a-z])er/ER_/
+      - xform/(?<![a-z])ai/AI_/
+      - xform/(?<![a-z])ei/EI_/
+      - xform/(?<![a-z])eh/EH_/
+      - xform/([aoe])\1/\U$1\E_/
+      - xform/(?<![a-z])yi(?!ng?)/Y_/
+      - xform/((?<![a-z])[rszc])i/\U$1\E_/
+      - xform/((?<![a-z])[ae])n(\w)?/\U$1n\E$2_/
+      - xform/(.)/\L$1\E/
+
+  luna_2_bopomofo:
+    # input: full pinyin, output: ㄅㄆㄇ
+    preedit_format:
+      - "xform/e?r5$/er5/"
+      - "xform/iu/iou/"
+      - "xform/ui/uei/"
+      - "xform/ong/ung/"
+      - "xform/yi?/i/"
+      - "xform/wu?/u/"
+      - "xform/iu/v/"
+      - "xform/([jqx])u/$1v/"
+      - "xform/([iuv])n/$1en/"
+      - "xform/zh/Z/"
+      - "xform/ch/C/"
+      - "xform/sh/S/"
+      - "xform/ai/A/"
+      - "xform/ei/I/"
+      - "xform/ao/O/"
+      - "xform/ou/U/"
+      - "xform/ang/K/"
+      - "xform/eng/G/"
+      - "xform/an/M/"
+      - "xform/en/N/"
+      - "xform/er/R/"
+      - "xform/eh/E/"
+      - "xform/([iv])e/$1E/"
+      - "xform/1//"
+      - "xlit|bpmfdtnlgkhjqxZCSrzcsiuvaoeEAIOUMNKGR2345ü|ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙ㄩ|"
+  flypy_2_bopomofo:
+    # input: flypy, output: ㄅㄆㄇ
+    preedit_format:
+      __include: /templates/flypy_2_luna/preedit_format
+      __append:
+        __include: /templates/luna_underscore_fix/preedit_format
+    __patch: # this is a hack to merge 2 additional lists...
+      preedit_format/+:
+        __include: /templates/luna_2_bopomofo/preedit_format
+
+translator:
+  dictionary: luna_pinyin
+  prism: flypy_luna
+  spelling_hints: 1
+  preedit_format:
+    __include: /templates/flypy_2_bopomofo/preedit_format
+
+punctuator:
+  import_preset: symbols
+
+key_binder:
+  import_preset: default
+
+recognizer:
+  import_preset: default
+  patterns:
+    translator_bopomofo_tw: "`b[-,.;/a-z0-9]*'?$"
+    translator_cangjie5: "`c[a-z]*'?$"
+    translator_cangjie5_phonetic: "`p[a-z]*'?$"
+
+editor:
+  bindings:
+    Return: confirm #使用 express_editor 時開啟
+    KP_Enter: confirm #使用 express_editor 時開啟
+    Shift+Return: commit_script_text # 輸入變換後上屏

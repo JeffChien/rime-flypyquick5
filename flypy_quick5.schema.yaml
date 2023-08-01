@@ -1,0 +1,54 @@
+# Rime schema
+# encoding: utf-8
+
+__include: flypy_luna.schema:/
+
+schema:
+  schema_id: flypy_quick5
+  name: 小鶴雙拼+速成
+  version: "0.0.3"
+  author:
+    - double pinyin layout by 鶴
+    - Rime schema by Jeff Chien <jeffchien13@gmail.com>
+  description: |
+    小鶴雙拼加速成補助方案
+  dependencies:
+    - bopomofo_tw
+
+speller:
+  alphabet: zyxwvutsrqponmlkjihgfedcba
+  algebra:
+    - derive/^(..).+$/$1/
+    # this is a very aggresive pattern, sometimes need to type ' to help rime to correctly pick candidate. or just comment it.
+    - derive/^(...).+$/$1/
+
+templates:
+  quick5:
+    preedit_format:
+      - 'xform/((?<=[a-z]{2})[a-z]{1,2})/\U$1\E/'
+      - "xlit|ABCDEFGHIJKLMNOPQRSTUVWXYZ|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符|"
+    comment_format:
+      - 'xform/((?<=[a-z]{2})[a-z]{1,2})/\U$1\E/'
+      - "xlit|ABCDEFGHIJKLMNOPQRSTUVWXYZ|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符|"
+
+translator:
+  spelling_hints: 4
+  dictionary: flypy_quick5
+  prism: flypy_quick5
+  preedit_format:
+    __include: templates/quick5/preedit_format
+  comment_format:
+    __include: templates/quick5/comment_format
+  __patch:
+    preedit_format/+:
+      __include: flypy_luna.schema:/templates/flypy_2_bopomofo/preedit_format
+
+reverse_lookup_flypy:
+  tags: [translator_bopomofo_tw]
+  overwrite_comment: true
+  dictionary: flypy_quick5
+  comment_format:
+    __include: templates/quick5/comment_format
+
+__patch:
+  - flypy_quick5.custom:/patch?
