@@ -240,7 +240,7 @@ templates:
       - "xform/(^|[ '])v/$1ZH/"
       - "xform/(^|[ '])i/$1CH/"
       - "xform/(^|[ '])u/$1SH/"
-      - xform/(.)/\L$1\E/
+      - xform/([A-Z])/\L$1\E/
       - xform/([jqxy])v/$1u/
       - xform/([nl])v/$1ü/
   # for some symbol that can work along, append _ to indicate those cases.
@@ -260,7 +260,7 @@ templates:
       - xform/(?<![a-z])yi(?!ng?)/Y_/
       - xform/((?<![a-z])[rszc])i/\U$1\E_/
       - xform/((?<![a-z])[ae])n(\w)?/\U$1n\E$2_/
-      - xform/(.)/\L$1\E/
+      - xform/([A-Z])/\L$1\E/
 
   luna_2_bopomofo:
     # input: full pinyin, output: ㄅㄆㄇ
